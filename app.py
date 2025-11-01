@@ -1,14 +1,17 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from marshmallow import ValidationError
 from extensions import db
+from flask_cors import CORS
 from schemas import UserSchema, BlogSchema, CommentSchema
 
 app = Flask(__name__)
 # Configuración de la aplicación
 app.config['SECRET_KEY'] = 'mi_super_secreto_12345'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@localhost/db_blogs'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@localhost/db_blog'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+#habilitacion de CORS para la aplicacion
+CORS(app)
 # Inicializar la extensión db con la aplicación
 db.init_app(app)
 
@@ -25,38 +28,66 @@ def users():
     if request.method == 'POST':
         try:
             user_data = UserSchema().load(request.json)
+            print("Datos recibidos en POST:", user_data)
+
             new_user = Users(
                 username=user_data['username'],
-                email=user_data['email']
+                email=user_data['email'],
+                role=user_data.get('role', 'user')
             )
+
             new_user.set_password(user_data['password'])
+
             db.session.add(new_user)
             db.session.commit()
+
             return UserSchema().dump(new_user), 201
+
         except ValidationError as err:
-            return {'Mensaje': f'Error en la validación: {err.messages}'}, 400
-    
+            return {'Mensaje': 'Error en la validación', 'Errores': err.messages}, 400
+
+        except Exception as e:
+            db.session.rollback()
+            print("Error interno en POST /users:", e)
+            return {'Mensaje': 'Error interno del servidor', 'Error': str(e)}, 500
     # Manejo para el método GET
     elif request.method == 'GET':
         all_users = Users.query.all()
         return {'users': UserSchema(many=True).dump(all_users)}, 200
 
-@app.route('/users/<int:user_id>', methods=['GET','PATCH','PUT','DELETE'])
+    
+
+@app.route('/users/<int:user_id>', methods=['GET', 'PATCH', 'PUT', 'DELETE'])
 def user(user_id):
     user = Users.query.get(user_id)
     if user is None:
-        return {'Mensaje': 'Usuario no encontrado'}, 404
+        return jsonify({'Mensaje': 'Usuario no encontrado'}), 404
+
     elif request.method == 'PUT':
         try:
             user_data = UserSchema().load(request.json)
+            print("Datos recibidos:", user_data)
+
             user.username = user_data['username']
             user.email = user_data['email']
-            if 'password' in user_data:
+
+            if 'role' in user_data and user_data['role']:
+                user.role = user_data['role']
+
+            if 'password' in user_data and user_data['password']:
                 user.set_password(user_data['password'])
+
             db.session.commit()
+            return jsonify({'Mensaje': 'Usuario actualizado correctamente'}), 200
+
         except ValidationError as err:
-            return{'Mensaje': f'Error en la validación: {err.messages}'},400
-            
+            return jsonify({'Mensaje': 'Error en la validación', 'Errores': err.messages}), 400
+
+        except Exception as e:
+            db.session.rollback()
+            print("Error interno en PUT /users:", e)
+            return jsonify({'Mensaje': 'Error interno del servidor', 'Error': str(e)}), 500
+                    
 
     elif request.method == 'PATCH':
         try:
@@ -66,13 +97,13 @@ def user(user_id):
             db.session.commit()
             return UserSchema().dump(user), 200
         except ValidationError as err:
-            return {'Mensaje': f'Error en la validación: {err.messages}'}, 400
+            return jsonify({'Mensaje': f'Error en la validación: {err.messages}'}), 400
 
 
     elif request.method == 'DELETE':
         db.session.delete(user)
         db.session.commit()
-        return {'Mensaje': 'Usuario eliminado correctamente'}, 200
+        return jsonify({'Mensaje': 'Usuario eliminado correctamente'}), 200
     
     elif request.method == 'GET':
         return UserSchema().dump(user), 200
