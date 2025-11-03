@@ -13,10 +13,10 @@ class UserSchema(Schema):
 class BlogSchema(Schema):
     id = fields.Int(dump_only=True)
     title = fields.Str(required=True)
-    description = fields.Str(required=True)  # Cambiado de 'content' a 'description' para coincidir con el modelo
+    description = fields.Str(required=True) 
     created_at = fields.DateTime(dump_only=True)
-    user_id = fields.Int(required=True)  # Cambiado de 'author_id' a 'user_id' para coincidir con el modelo
-    category_id = fields.Int(required=False)  # Añadido para manejar la relación con categorías
+    user_id = fields.Int(required=True)  
+    category_id = fields.Int(required=False) 
     comments = fields.Nested('CommentSchema', many=True, dump_only=True)
     
 class CommentSchema(Schema):
