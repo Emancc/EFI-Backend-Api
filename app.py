@@ -1,9 +1,9 @@
-from flask import Flask, request, jsonify
-from marshmallow import ValidationError
+from flask import Flask
 from extensions import db
 from flask_cors import CORS
-from views.user import UsersAPI, UserDetailAPI,BlogsAPI, BlogDetailAPI, CommentsAPI, CommentDetailAPI
-from schemas import UserSchema, BlogSchema, CommentSchema
+from views.user import UsersAPI, UserDetailAPI
+from views.blogs import BlogsAPI, BlogDetailAPI
+from views.comments import CommentsAPI, CommentDetailAPI
 
 app = Flask(__name__)
 # Configuración de la aplicación
