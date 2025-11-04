@@ -36,4 +36,4 @@ class RegisterSchema(Schema):
 
 class LoginSchema(Schema):
     email = fields.Email(required=True)
-    password = fields.Str(required=True)
+    password = fields.Str(required=True, load_only=True)

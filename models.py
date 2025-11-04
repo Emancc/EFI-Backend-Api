@@ -8,19 +8,13 @@ class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     role = db.Column(db.String(50), default='user')
     
 
     # Relación con blogs
     blogs = db.relationship('Blogs', backref='author', lazy=True)
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+    credentials = db.relationship('UserCredentials', backref='user_info', uselist=False)
 
 
 class Category(db.Model):
@@ -75,7 +69,6 @@ class UserCredentials(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'),unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
     role = db.Column(db.String(50), nullable=False, default='user')
-    user = db.relationship('Users', backref=db.backref('credentials', uselist=False))
 
     def __str__(self)-> str:
         return f"User Credentials for user id ={self.user_id}, role={self.role}"

@@ -4,6 +4,7 @@ from flask_cors import CORS
 from views.user import UsersAPI, UserDetailAPI
 from views.blogs import BlogsAPI, BlogDetailAPI
 from views.comments import CommentsAPI, CommentDetailAPI
+from views.Login_y_Register import RegisterAPI
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from datetime import timedelta
 
@@ -15,7 +16,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 app.config['JWT_SECRET_KEY'] = 'mi_jwt_secreto_12345'
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
- 
+
 jwt = JWTManager(app)
 
 
@@ -32,6 +33,13 @@ with app.app_context():
     # Crear todas las tablas definidas en los modelos
     db.create_all()
 
+
+#Rutas Register y login------
+app.add_url_rule(
+    '/register',
+    view_func=RegisterAPI.as_view('register_api'),
+    methods=['POST']
+)
 #Rutas para Users------
 
 app.add_url_rule(
