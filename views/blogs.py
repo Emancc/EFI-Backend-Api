@@ -2,6 +2,7 @@ from flask.views import MethodView
 from flask import request, jsonify
 from extensions import db
 from models import Blogs
+from flask_jwt_extended import jwt_required
 from schemas import BlogSchema
 from marshmallow import ValidationError
 
@@ -28,6 +29,7 @@ class BlogsAPI(MethodView):
         
 
 class BlogDetailAPI(MethodView):
+    @jwt_required()
     def get(self, blog_id):
         blog = Blogs.query.get(blog_id)
         if not blog:
