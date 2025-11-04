@@ -67,3 +67,15 @@ class Comment(db.Model):
 
     def __repr__(self):
         return f"<Comment {self.id} on Blog {self.blog_id}>"
+    
+
+class UserCredentials(db.Model):
+    __tablename__ = 'user_credentials'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'),unique=True, nullable=False)
+    password_hash = db.Column(db.String(256), nullable=False)
+    role = db.Column(db.String(50), nullable=False, default='user')
+    user = db.relationship('Users', backref=db.backref('credentials', uselist=False))
+
+    def __str__(self)-> str:
+        return f"User Credentials for user id ={self.user_id}, role={self.role}"

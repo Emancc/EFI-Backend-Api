@@ -4,12 +4,20 @@ from flask_cors import CORS
 from views.user import UsersAPI, UserDetailAPI
 from views.blogs import BlogsAPI, BlogDetailAPI
 from views.comments import CommentsAPI, CommentDetailAPI
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from datetime import timedelta
 
 app = Flask(__name__)
 # Configuración de la aplicación
 app.config['SECRET_KEY'] = 'mi_super_secreto_12345'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@localhost/db_blog'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+app.config['JWT_SECRET_KEY'] = 'mi_jwt_secreto_12345'
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
+ 
+jwt = JWTManager(app)
+
 
 #habilitacion de CORS para la aplicacion
 CORS(app)
