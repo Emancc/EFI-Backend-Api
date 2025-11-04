@@ -4,7 +4,7 @@ from flask_cors import CORS
 from views.user import UsersAPI, UserDetailAPI
 from views.blogs import BlogsAPI, BlogDetailAPI
 from views.comments import CommentsAPI, CommentDetailAPI
-from views.Login_y_Register import RegisterAPI
+from views.Login_y_Register import RegisterAPI, LoginAPI
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from datetime import timedelta
 
@@ -19,18 +19,10 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 
 jwt = JWTManager(app)
 
-
-#habilitacion de CORS para la aplicacion
 CORS(app)
-# Inicializar la extensión db con la aplicación
 db.init_app(app)
 
-# Importar los modelos después de inicializar db
-from models import Users, Blogs, Category, Comment
-
-# Crear un contexto de aplicación para crear las tablas
 with app.app_context():
-    # Crear todas las tablas definidas en los modelos
     db.create_all()
 
 
@@ -38,6 +30,12 @@ with app.app_context():
 app.add_url_rule(
     '/register',
     view_func=RegisterAPI.as_view('register_api'),
+    methods=['POST']
+)
+
+app.add_url_rule(
+    '/login',
+    view_func=LoginAPI.as_view('login_api'),
     methods=['POST']
 )
 #Rutas para Users------

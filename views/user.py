@@ -1,6 +1,12 @@
 from flask.views import MethodView
 from flask import request, jsonify      
 from extensions import db
+from flask_jwt_extended import (
+    jwt_required,
+    get_jwt,
+    get_jwt_identity,
+    create_access_token
+)
 from models import Users
 from schemas import UserSchema
 from marshmallow import ValidationError
@@ -19,7 +25,7 @@ class UsersAPI(MethodView):
             new_user = Users(
                 username=user_data['username'],
                 email=user_data['email'],
-                role=user_data.get('role', 'user')
+                role=user_data.get['role']
             )
 
             new_user.set_password(user_data['password'])
@@ -38,7 +44,13 @@ class UsersAPI(MethodView):
             return {'Mensaje': 'Error interno del servidor', 'Error': str(e)}, 500
         
 class UserDetailAPI(MethodView):
+    @jwt_required()
     def get(self, user_id):
+        token_data = get_jwt()
+        print("Datos del token JWT:", token_data)
+        role = token_data['role']
+        if role != 'admin':
+            return jsonify({'Mensaje': 'Acceso no autorizado solo el grado admin esta permitido'}), 403
         user = Users.query.get(user_id)
         if user is None:
             return jsonify({'Mensaje': 'Usuario no encontrado'}), 404

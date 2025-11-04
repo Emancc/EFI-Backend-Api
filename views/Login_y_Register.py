@@ -1,11 +1,17 @@
 from flask import request, jsonify
+from datetime import timedelta
 from extensions import db
 from models import Users
 from schemas import RegisterSchema, LoginSchema, UserSchema
 from marshmallow import ValidationError
 from flask.views import MethodView
 from passlib.hash import bcrypt
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import (
+    jwt_required,
+    create_access_token,
+    get_jwt_identity,
+    get_jwt
+)
 from models import UserCredentials
 
 class RegisterAPI(MethodView):
@@ -50,10 +56,19 @@ class LoginAPI(MethodView):
         user = Users.query.filter_by(email=data["email"]).first()
 
         if not user or not user.credentials:
-            return jsonify({"error": "Credenciales inválidas"}), 401
+            return jsonify({"error": "No posee credenciales o son inválidas"}), 401
         
         if not bcrypt.verify(data["password"], user.credentials.password_hash):
             return jsonify({"error": "Credenciales inválidas"}), 401
-        
-        access_token = create_access_token(identity=user.id)
-        return jsonify({"access_token": access_token}), 200
+
+        additional_claims = {
+            "email": user.email,
+            "role": user.role,
+            "username": user.username
+        }
+        token = create_access_token(
+            identity=str(user.id),
+            additional_claims=additional_claims,
+            expires_delta=timedelta(hours=1)
+        )
+        return jsonify({"access_token": token}), 200
