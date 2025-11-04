@@ -33,7 +33,7 @@ app.add_url_rule(
 )
 
 app.add_url_rule(
-    '/users/<int:id>',
+    '/users/<int:user_id>',
     view_func=UserDetailAPI.as_view('user_detail_api'),
     methods=['GET', 'PUT', 'PATCH', 'DELETE']
 )

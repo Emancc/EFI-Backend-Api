@@ -79,3 +79,11 @@ class UserDetailAPI(MethodView):
             return UserSchema().dump(user), 200
         except ValidationError as err:
             return jsonify({'Mensaje': f'Error en la validación: {err.messages}'}), 400
+    
+    def delete(self, user_id):
+        user = Users.query.get(user_id)
+        if user is None:
+            return jsonify({'Mensaje': 'Usuario no encontrado'}), 404
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({'Mensaje': 'Usuario eliminado correctamente'}), 200
