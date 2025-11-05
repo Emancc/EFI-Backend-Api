@@ -1,7 +1,7 @@
 from extensions import db
 from datetime import datetime
 
-
+#---------------------- Modelos de Users --------------------
 class Users(db.Model):
     __tablename__ = 'users'
 
@@ -12,11 +12,10 @@ class Users(db.Model):
     role = db.Column(db.String(50), default='user')
     
 
-    # Relación con blogs
     blogs = db.relationship('Blogs', backref='author', lazy=True)
     credentials = db.relationship('UserCredentials', back_populates='user', uselist=False)
 
-
+#---------------------- Modelos de Category--------------------
 class Category(db.Model):
     __tablename__ = 'category'
 
@@ -29,7 +28,7 @@ class Category(db.Model):
     def __repr__(self):
         return f"<Category {self.name}>"
 
-
+#---------------------- Modelos de Blogs --------------------
 class Blogs(db.Model):
     __tablename__ = 'blogs'
 
@@ -38,18 +37,15 @@ class Blogs(db.Model):
     description = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     
-    # Clave foránea que referencia a Users.id
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    # Clave foránea que referencia a Category.id
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
     
-    # Relaciones
     comments = db.relationship('Comment', backref='blog', lazy=True, cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"<Blog {self.title}>"
 
-
+#---------------------- Modelos de Comments --------------------
 class Comment(db.Model):
     __tablename__ = 'comments'
 
@@ -57,18 +53,15 @@ class Comment(db.Model):
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     
-    # Clave foránea que referencia a Users.id
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    # Clave foránea que referencia a Blogs.id
     blog_id = db.Column(db.Integer, db.ForeignKey('blogs.id'), nullable=False)
     
-    # Relación con el usuario que hizo el comentario
     user = db.relationship('Users', backref=db.backref('comments', lazy=True))
 
     def __repr__(self):
         return f"<Comment {self.id} on Blog {self.blog_id}>"
     
-
+#---------------------- Modelos de UserCredentials --------------------
 class UserCredentials(db.Model):
     __tablename__ = 'user_credentials'
 

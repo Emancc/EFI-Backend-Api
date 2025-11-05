@@ -19,7 +19,7 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 
 jwt = JWTManager(app)
 
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 db.init_app(app)
 
 with app.app_context():

@@ -1,4 +1,5 @@
 from flask import request, jsonify
+from datetime import timedelta
 from flask.views import MethodView
 from extensions import db
 from passlib.hash import bcrypt
@@ -52,9 +53,19 @@ class LoginAPI(MethodView):
 
         if not bcrypt.verify(password, user.credentials.password_hash):
             return jsonify({"error": "Contraseña incorrecta"}), 401
+        
+        aditonal_claims = {
+            "role": user.role,
+            "email": user.email,
+            "username": user.username      
+        }
+        identity = str(user.id)
 
-        # Crear token JWT
-        access_token = create_access_token(identity={"id": user.id, "username": user.username, "role": user.role})
+        access_token = create_access_token(
+            identity=identity,
+            additional_claims=aditonal_claims,
+            expires_delta=timedelta(hours=1)            
+            )
 
         return jsonify({
             "message": "Inicio de sesión exitoso",
