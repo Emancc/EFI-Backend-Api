@@ -1,4 +1,4 @@
-from flask import request, jsonify
+'''from flask import request, jsonify
 from datetime import timedelta
 from extensions import db
 from models import Users
@@ -74,4 +74,4 @@ class LoginAPI(MethodView):
             additional_claims=additional_claims,
             expires_delta=timedelta(hours=1)
         )
-        return jsonify({"access_token": token}), 200
+        return jsonify({"access_token": token}), 200'''

@@ -4,7 +4,7 @@ from flask_cors import CORS
 from views.user import UsersAPI, UserDetailAPI
 from views.blogs import BlogsAPI, BlogDetailAPI
 from views.comments import CommentsAPI, CommentDetailAPI
-from views.Login_y_Register import RegisterAPI, LoginAPI
+from views.auth import RegisterAPI, LoginAPI
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from datetime import timedelta
 
