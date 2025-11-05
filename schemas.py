@@ -5,10 +5,17 @@ class UserSchema(Schema):
     password = fields.Str(load_only=True)
     email = fields.Email(required=True)
     username = fields.Str(required=True)
+    password_hash = fields.Method("get_password_hash", dump_only=True, load_only=True) 
     created_at = fields.DateTime(dump_only=True)
-    role = fields.Str()
+    role = fields.Str(load_default='user')
     blogs = fields.Nested('BlogSchema', many=True, dump_only=True)
     comments = fields.Nested('CommentSchema', many=True, dump_only=True)
+    
+    def get_password_hash(self, obj):
+        return getattr(obj, 'password_hash', None)
+    
+    class Meta:
+        fields = ('id', 'username', 'email', 'password', 'role', 'created_at')
 
 class BlogSchema(Schema):
     id = fields.Int(dump_only=True)

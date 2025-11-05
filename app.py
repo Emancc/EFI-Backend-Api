@@ -40,11 +40,8 @@ app.add_url_rule(
 )
 #Rutas para Users------
 
-app.add_url_rule(
-    '/users',
-    view_func=UsersAPI.as_view('users_api'),
-    methods=['POST', 'GET']
-)
+users_view = UsersAPI.as_view('users_api')
+app.add_url_rule('/users', view_func=users_view, methods=['GET', 'POST'])
 
 app.add_url_rule(
     '/users/<int:user_id>',

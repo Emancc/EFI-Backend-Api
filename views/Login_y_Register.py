@@ -36,11 +36,14 @@ class RegisterAPI(MethodView):
 
         # Crear credenciales
         password_hash = bcrypt.hash(data["password"])
+
+        user_password = Users(password_hash=password_hash)
+        
         credentials = UserCredentials(
             user_id=new_user.id,
             password_hash=password_hash
         )
-        db.session.add(credentials)
+        db.session.add(credentials,user_password)
         db.session.commit()
 
         return jsonify({"message": "Usuario registrado exitosamente"}), 201
