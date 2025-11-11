@@ -12,14 +12,25 @@ class UserSchema(Schema):
     comments = fields.Nested('CommentSchema', many=True, dump_only=True)
 
     
+from marshmallow import Schema, fields
+
 class BlogSchema(Schema):
     id = fields.Int(dump_only=True)
     title = fields.Str(required=True)
-    description = fields.Str(required=True) 
+    description = fields.Str(required=True)
     created_at = fields.DateTime(dump_only=True)
-    user_id = fields.Int(required=True)  
-    category_id = fields.Int(required=False) 
-    comments = fields.Nested('CommentSchema', many=True, dump_only=True)
+
+    # ⚙️ El user_id no se carga desde el cliente (lo tomás con get_jwt_identity())
+    user_id = fields.Int(dump_only=True)
+
+    # category_id es opcional, y puede venir vacío
+    category_id = fields.Int(allow_none=True)
+
+    # Relaciones
+    author = fields.Nested("UserSchema", only=["id", "username"], dump_only=True)
+    category = fields.Nested("CategorySchema", only=["id", "name"], dump_only=True)
+    comments = fields.Nested("CommentSchema", many=True, dump_only=True)
+
     
 class CommentSchema(Schema):
     id = fields.Int(dump_only=True)
@@ -33,7 +44,7 @@ class CategorySchema(Schema):
     name = fields.Str(required=True)
     slug = fields.Str()
     description = fields.Str(allow_none=True)
-    
+
 class RegisterSchema(Schema):
     username = fields.Str(required=True)
     email = fields.Email(required=True)

@@ -41,7 +41,8 @@ class Blogs(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
     
     comments = db.relationship('Comment', backref='blog', lazy=True, cascade='all, delete-orphan')
-
+    category = db.relationship('Category', back_populates='blogs') 
+    
     def __repr__(self):
         return f"<Blog {self.title}>"
 

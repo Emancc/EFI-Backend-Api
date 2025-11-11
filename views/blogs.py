@@ -1,7 +1,8 @@
 from flask.views import MethodView
 from flask import request, jsonify
 from extensions import db
-from models import Blogs,Category
+from models import Blogs
+from sqlalchemy.orm import joinedload
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from schemas import BlogSchema
 from marshmallow import ValidationError
@@ -9,7 +10,10 @@ from marshmallow import ValidationError
 
 class BlogsAPI(MethodView):
     def get(self):
-        all_blogs = Blogs.query.all()
+        all_blogs = Blogs.query.options(
+            joinedload(Blogs.category),
+            joinedload(Blogs.author)  # si quieres mostrar autor también
+        ).all()
         return {'blogs': BlogSchema(many=True).dump(all_blogs)}, 200
     
     @jwt_required()
@@ -60,8 +64,11 @@ class BlogDetailAPI(MethodView):
         blog = Blogs.query.get(blog_id)
         if not blog:
             return {'Mensaje': 'Blog no encontrado'}, 404
+        
+        # Devuelve el blog junto con autor y categoría (gracias a BlogSchema anidado)
         return BlogSchema().dump(blog), 200
 
+    @jwt_required()
     def put(self, blog_id):
         blog = Blogs.query.get(blog_id)
         if not blog:
@@ -78,6 +85,7 @@ class BlogDetailAPI(MethodView):
         except ValidationError as err:
             return {'Mensaje': f'Error en la validación: {err.messages}'}, 400
 
+    @jwt_required()
     def patch(self, blog_id):
         blog = Blogs.query.get(blog_id)
         if not blog:
@@ -92,6 +100,7 @@ class BlogDetailAPI(MethodView):
         except ValidationError as err:
             return {'Mensaje': f'Error en la validación: {err.messages}'}, 400
 
+    @jwt_required()
     def delete(self, blog_id):
         blog = Blogs.query.get(blog_id)
         if not blog:
