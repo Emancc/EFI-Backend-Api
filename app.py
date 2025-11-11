@@ -5,6 +5,7 @@ from views.user import UsersAPI, UserDetailAPI
 from views.blogs import BlogsAPI, BlogDetailAPI
 from views.comments import CommentsAPI, CommentDetailAPI
 from views.auth import RegisterAPI, LoginAPI
+from views.categories import CategoriesAPI
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from datetime import timedelta
 
@@ -47,6 +48,14 @@ app.add_url_rule(
     '/users/<int:user_id>',
     view_func=UserDetailAPI.as_view('user_detail_api'),
     methods=['GET', 'PUT', 'PATCH', 'DELETE']
+)
+
+
+#Rutas para Categories------
+app.add_url_rule(
+    '/categories',
+    view_func=CategoriesAPI.as_view('categories_api'),
+    methods=['POST', 'GET']
 )
 
 #Rutas para Blogs------

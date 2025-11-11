@@ -28,8 +28,12 @@ class CommentSchema(Schema):
     user_id = fields.Int(required=True)
     blog_id = fields.Int(required=True)
 
-
-
+class CategorySchema(Schema):
+    id = fields.Int(dump_only=True)
+    name = fields.Str(required=True)
+    slug = fields.Str()
+    description = fields.Str(allow_none=True)
+    
 class RegisterSchema(Schema):
     username = fields.Str(required=True)
     email = fields.Email(required=True)
