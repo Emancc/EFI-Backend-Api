@@ -34,10 +34,14 @@ class BlogSchema(Schema):
     
 class CommentSchema(Schema):
     id = fields.Int(dump_only=True)
-    description = fields.Str(required=True)
+    content = fields.Str(data_key="description", required=True)
     created_at = fields.DateTime(dump_only=True)
-    user_id = fields.Int(required=True)
+    user_id = fields.Int(dump_only=True)
     blog_id = fields.Int(required=True)
+    user = fields.Nested("UserSchema", only=["id", "username"], dump_only=True)
+
+
+    user = fields.Nested("UserSchema", only=["id", "username"], dump_only=True)
 
 class CategorySchema(Schema):
     id = fields.Int(dump_only=True)

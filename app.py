@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from extensions import db
 from flask_cors import CORS
 from views.user import UsersAPI, UserDetailAPI
@@ -20,12 +20,45 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 
 jwt = JWTManager(app)
 
-CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+CORS(
+    app,
+    resources={r"/*": {"origins": "http://localhost:5173"}},
+    supports_credentials=True,
+    allow_headers=["Content-Type", "Authorization"],
+    methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+)
 db.init_app(app)
 
 with app.app_context():
     db.create_all()
 
+#------------------------------------MANEJO DE ERRORES JWT------------------------------------#
+# -------- Errores siempre en JSON --------
+@app.errorhandler(404)
+def not_found(e):
+    return jsonify({"Mensaje": "not_found"}), 404
+
+@app.errorhandler(405)
+def method_not_allowed(e):
+    return jsonify({"Mensaje": "method_not_allowed"}), 405
+
+@app.errorhandler(500)
+def server_error(e):
+    return jsonify({"Mensaje": "server_error"}), 500
+
+# -------- Respuestas JWT en JSON (sin redirecciones HTML) --------
+@jwt.unauthorized_loader
+def missing_jwt(err):
+    return jsonify({"Mensaje": "unauthorized", "Detalle": err}), 401
+
+@jwt.invalid_token_loader
+def invalid_jwt(err):
+    return jsonify({"Mensaje": "invalid_token", "Detalle": err}), 422
+
+@jwt.expired_token_loader
+def expired_jwt(jwt_header, jwt_payload):
+    return jsonify({"Mensaje": "token_expired"}), 401
+#------------------------------------FIN MANEJO DE ERRORES JWT------------------------------------#
 
 #Rutas Register y login------
 app.add_url_rule(
