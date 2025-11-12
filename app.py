@@ -11,7 +11,9 @@ from datetime import timedelta
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mi_super_secreto_12345'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@localhost/db_blog'
+app.config['SQLALCHEMY_DATABASE_URI'] = ('mysql+pymysql://BD2021:BD2021itec@143.198.156.171:3306/EFI_python2')
+
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@localhost/db_blog' <---- esta fue la base en local utilizada para el desarrollo
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 app.config['JWT_SECRET_KEY'] = 'mi_jwt_secreto_12345'
