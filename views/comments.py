@@ -1,4 +1,3 @@
-# views/comments.py
 from flask.views import MethodView
 from flask import request, jsonify
 from extensions import db
@@ -17,7 +16,6 @@ class CommentsAPI(MethodView):
     def post(self):
         try:
             payload = request.get_json() or {}
-            # user_id es dump_only en tu schema; pedimos description y blog_id
             data = CommentSchema(partial=("user_id",)).load(payload)
 
             uid = get_jwt_identity()
@@ -28,7 +26,6 @@ class CommentsAPI(MethodView):
             if not blog:
                 return jsonify({"Mensaje": "Blog no válido"}), 400
 
-            # Tu schema usa 'description' y mapea al atributo 'content'
             new_comment = Comment(
                 content=data["content"],
                 user_id=uid,
@@ -64,7 +61,6 @@ class CommentDetailAPI(MethodView):
         try:
             data = CommentSchema().load(request.get_json())
             comment.content = data['content']
-            # Opcional: si querés, no permitas cambiar user_id por seguridad
             comment.user_id = data['user_id']
             comment.blog_id = data['blog_id']
             db.session.commit()
@@ -94,5 +90,4 @@ class CommentDetailAPI(MethodView):
             return jsonify({'Mensaje': 'Comentario no encontrado'}), 404
         db.session.delete(comment)
         db.session.commit()
-        # Mantengo 200 con JSON porque tu frontend hace res.json()
         return jsonify({'Mensaje': 'Comentario eliminado correctamente'}), 200

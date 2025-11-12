@@ -10,7 +10,6 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from datetime import timedelta
 
 app = Flask(__name__)
-# Configuración de la aplicación
 app.config['SECRET_KEY'] = 'mi_super_secreto_12345'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@localhost/db_blog'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -33,7 +32,6 @@ with app.app_context():
     db.create_all()
 
 #------------------------------------MANEJO DE ERRORES JWT------------------------------------#
-# -------- Errores siempre en JSON --------
 @app.errorhandler(404)
 def not_found(e):
     return jsonify({"Mensaje": "not_found"}), 404
@@ -46,7 +44,6 @@ def method_not_allowed(e):
 def server_error(e):
     return jsonify({"Mensaje": "server_error"}), 500
 
-# -------- Respuestas JWT en JSON (sin redirecciones HTML) --------
 @jwt.unauthorized_loader
 def missing_jwt(err):
     return jsonify({"Mensaje": "unauthorized", "Detalle": err}), 401
@@ -58,7 +55,6 @@ def invalid_jwt(err):
 @jwt.expired_token_loader
 def expired_jwt(jwt_header, jwt_payload):
     return jsonify({"Mensaje": "token_expired"}), 401
-#------------------------------------FIN MANEJO DE ERRORES JWT------------------------------------#
 
 #Rutas Register y login------
 app.add_url_rule(
@@ -72,8 +68,8 @@ app.add_url_rule(
     view_func=LoginAPI.as_view('login_api'),
     methods=['POST']
 )
-#Rutas para Users------
 
+#Rutas para Users------
 users_view = UsersAPI.as_view('users_api')
 app.add_url_rule('/users', view_func=users_view, methods=['GET', 'POST'])
 
@@ -92,7 +88,6 @@ app.add_url_rule(
 )
 
 #Rutas para Blogs------
-
 app.add_url_rule(
     '/blogs',
     view_func=BlogsAPI.as_view('blogs_api'),
@@ -117,7 +112,5 @@ app.add_url_rule(
 )
 
 
-
-#Rutas por cambiar
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

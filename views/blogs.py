@@ -19,28 +19,24 @@ class BlogsAPI(MethodView):
     @jwt_required()
     def post(self):
         try:
-            # Validar datos del request sin user_id (lo tomamos del JWT)
             blog_data = BlogSchema(exclude=["user_id"]).load(request.json)
             current_user_id = get_jwt_identity()
 
-            # Obtener category_id si viene
             category_id = blog_data.get('category_id')
 
-            # 🔹 Validar si la categoría existe (solo si se envía)
             if category_id:
-                from models import Category  # importar aquí para evitar import circular
+                from models import Category  
                 category = Category.query.get(category_id)
                 if not category:
                     return {
                         "Mensaje": f"La categoría con id {category_id} no existe."
                     }, 400
 
-            # Crear nuevo blog
             new_blog = Blogs(
                 title=blog_data['title'],
                 description=blog_data['description'],
                 user_id=current_user_id,
-                category_id=category_id  # puede ser None
+                category_id=category_id 
             )
 
             db.session.add(new_blog)
@@ -52,7 +48,6 @@ class BlogsAPI(MethodView):
             return {'Mensaje': f'Error en la validación: {err.messages}'}, 400
 
         except Exception as e:
-            # 🔹 Captura cualquier otro error de BD o integridad
             db.session.rollback()
             return {'Mensaje': f'Error al crear el blog: {str(e)}'}, 500
 
@@ -65,7 +60,6 @@ class BlogDetailAPI(MethodView):
         if not blog:
             return {'Mensaje': 'Blog no encontrado'}, 404
         
-        # Devuelve el blog junto con autor y categoría (gracias a BlogSchema anidado)
         return BlogSchema().dump(blog), 200
 
     @jwt_required()
@@ -93,7 +87,7 @@ class BlogDetailAPI(MethodView):
         try:
             blog_data = BlogSchema().load(request.json, partial=True)
             for key, value in blog_data.items():
-                if hasattr(blog, key):  # Solo actualizar atributos existentes
+                if hasattr(blog, key):  
                     setattr(blog, key, value)
             db.session.commit()
             return BlogSchema().dump(blog), 200

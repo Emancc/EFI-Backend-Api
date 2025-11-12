@@ -20,13 +20,10 @@ class BlogSchema(Schema):
     description = fields.Str(required=True)
     created_at = fields.DateTime(dump_only=True)
 
-    # ⚙️ El user_id no se carga desde el cliente (lo tomás con get_jwt_identity())
     user_id = fields.Int(dump_only=True)
 
-    # category_id es opcional, y puede venir vacío
     category_id = fields.Int(allow_none=True)
 
-    # Relaciones
     author = fields.Nested("UserSchema", only=["id", "username"], dump_only=True)
     category = fields.Nested("CategorySchema", only=["id", "name"], dump_only=True)
     comments = fields.Nested("CommentSchema", many=True, dump_only=True)

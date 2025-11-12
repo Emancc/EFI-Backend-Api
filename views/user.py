@@ -9,7 +9,6 @@ from schemas import UserSchema,RegisterSchema
 from marshmallow import ValidationError
 
 
-#---------------------- Clase UsersAPI: /users --------------------
 
 class UsersAPI(MethodView):
     @jwt_required()
@@ -71,7 +70,6 @@ class UsersAPI(MethodView):
             }), 500
 
 
-#---------------- Clase UserDetailAPI: /users/<user_id>-----------------------
 
 class UserDetailAPI(MethodView):
     @jwt_required()
