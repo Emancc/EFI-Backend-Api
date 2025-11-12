@@ -68,3 +68,6 @@ INSERT INTO category (name, slug, description) VALUES
 ('Cloud & Infra','cloud-infra','Categoría: Cloud & Infra'),
 ('Linux & Dev Tools','linux-dev-tools','Categoría: Linux & Dev Tools'),
 ('Proyectos EFI','proyectos-efi','Categoría: Proyectos EFI');
+
+#inicializar el proyecto con
+flask run --reload
